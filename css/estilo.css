@@ -1,0 +1,43 @@
+body{
+	background-color:white;
+}
+
+.division{
+	display: block;
+	vertical-align:top;
+}
+
+.encabezado{
+	font-weight: bold;
+	text-align:center;
+	background-color: #6A0888;
+	color: #ffffff;
+}
+
+.boton{
+	border: 2px solid lightgray;
+    border-radius: 10px;
+}
+
+tr.alta{
+	background-color:yellow;
+}
+
+tr.urgente{
+	background-color:red;
+}
+
+tr.media{
+	background-color:blue;
+}
+
+tr.baja{
+	background-color:green;
+}
+
+input.invalido {box-shadow: 0 0 5px 1px purple;}
+
+table.grid{border:1px solid black; border-collapse: collapse;}
+table.grid thead tr {border:1px solid black; background-color: #6A0888; color: #ffffff; }
+table.grid thead tr th{border:inherit;}
+

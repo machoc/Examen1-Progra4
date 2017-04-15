@@ -1,0 +1,160 @@
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title>Registro de Trabajos</title>
+	<link rel="stylesheet" title="normal" type="text/css" href="css/estilo.css">
+	<script type="text/javascript" src="js/Trabajo.js"></script>
+	<script type="text/javascript" src="js/Storage.js"></script>
+</head>
+<body>
+	<div id="formularioDiv" class="division">
+		<form method="POST" id="formulario" name="formulario" action="javascript:agregar();">
+			<table border=1 cellpadding=3 cellspacing=4>
+				<tr><td class="encabezado">Trabajo</td></tr>
+				<tr><td>Codigo<hr><input type="text" name="codigo" id="codigo"></td></tr>
+				<tr><td>Descripcion<hr><input type="text" name="descripcion" id="descripcion"></td></tr>
+				<tr><td>Prioridad<hr>
+					<select name="prioridad" id="prioridad">
+						<option id="baja" value="Baja">Baja</option>
+						<option id="media" value="Media">Media</option>
+						<option id="alta" value="Alta">Alta</option>
+						<option id="urgente" value="Urgente">Urgente</option>
+					</select>
+				</td></tr>
+				<tr><td align="center" class="encabezado"><input type="submit" class="boton" id="agregar" value="Registrar"></td></tr>
+			</table>
+		</form>
+	</div>
+	<hr>
+	<div id="tablaDiv" class="division">
+		<table class="grid">
+		<thead><tr><th>Codigo</th><th>Descripcion</th><th>Prioridad</th><th>...</th><th>...</th></tr></thead>
+		<tbody id="listado"></tbody>
+		</table>
+	</div>
+</body>
+
+<script>
+  var trabajos;
+  var trabajo;
+  function cargarPagina(event){
+    var codigo=document.getElementById("codigo"); 
+    var descripcion=document.getElementById("descripcion");
+	var prioridad=document.getElementById("prioridad");
+    var formulario=document.getElementById("formulario");
+    formulario.addEventListener("submit",validar);
+	trabajos = Storage.retrieve("trabajos");
+    if (trabajos == null){
+		trabajos=[];
+		Storage.store("trabajos",trabajos);
+	}
+	listarTrabajos(trabajos);
+  }
+  function validar(event){
+    var codigo=document.getElementById("codigo"); 
+    var descripcion=document.getElementById("descripcion");
+	var error=false;
+	
+	codigo.classList.remove("invalido");
+	if (codigo.value.length==0){
+		codigo.classList.add("invalido");
+		error=true;
+	}
+
+	descripcion.classList.remove("invalido");
+	if (descripcion.value.length==0){
+		descripcion.classList.add("invalido");
+		error=true;
+	}
+
+	if (error){event.preventDefault();}
+  }
+  function agregar(){
+	if(revisaCodigoRepetido()){
+    var codigo=document.getElementById("codigo"); 
+    var descripcion=document.getElementById("descripcion");
+    var prioridad=document.getElementById("prioridad");
+	
+	trabajo = new Trabajo(codigo.value,descripcion.value,prioridad.value);
+	trabajos.push(trabajo);
+	Storage.store("trabajos",trabajos);
+	
+	var listado=document.getElementById("listado");
+	listarTrabajo(listado,trabajo);
+	
+	window.alert("Data sent: "+trabajo.completo("-"));
+    var formulario=document.getElementById("formulario");
+    formulario.reset();
+	}	
+  }
+  function listarTrabajos(){
+	var listado=document.getElementById("listado");
+	listado.innerHTML="";
+	for (i=0;i<trabajos.length;i++){
+	  listarTrabajo(listado,trabajos[i]);
+	}
+  }
+  function listarTrabajo(listado,trab){
+	var tr =document.createElement("tr");
+	var td;
+	td=document.createElement("td");
+	td.appendChild(document.createTextNode(trab.codigo));
+	tr.appendChild(td);
+	td =document.createElement("td");
+	td.appendChild(document.createTextNode(trab.descripcion));
+	tr.appendChild(td);
+	td1 =document.createElement("td");
+	td1.appendChild(document.createTextNode(trab.prioridad));
+	tr.appendChild(td1);
+	var img;
+
+	td= document.createElement("td");
+    img= document.createElement("img");
+    img.src="imagenes/arriba.png";
+	img.title="Subir prioridad"
+	img.setAttribute ("datos", i);
+    img.addEventListener("click", function(e){subir();});
+    td.appendChild(img);
+    tr.appendChild(td);
+	
+    td= document.createElement("td");
+    img= document.createElement("img");
+    img.src="imagenes/abajo.png";
+	img.title="Bajar prioridad"
+	img.setAttribute ("datos", i);
+    img.addEventListener("click", function(e){bajar();});
+    td.appendChild(img);
+    tr.appendChild(td);
+	
+	tr.classList.add(trabajos[i].prioridad);
+	listado.appendChild(tr);  
+  }
+
+  
+  function bajar (){
+	var i = event.target.getAttribute ("datos");
+	var trabajo = trabajos[i];
+	trabajo.bajarPrioridad();
+	Storage.store("trabajos", trabajos);
+	listarTrabajos();
+}
+
+  function subir (){
+	var i = event.target.getAttribute ("datos");
+	var trabajo = trabajos[i];
+	trabajo.subirPrioridad();
+	Storage.store("trabajos", trabajos);
+	listarTrabajos();
+}
+
+  function revisaCodigoRepetido (){
+	for (i = 0;i < trabajos.length; i++)
+		if (codigo.value === trabajos[i].codigo){
+		window.alert("El codigo esta repetido");
+			return false;
+		}
+	return true;
+}
+  document.addEventListener("DOMContentLoaded",cargarPagina)
+</script>
+</html>
